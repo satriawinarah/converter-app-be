@@ -2,12 +2,10 @@ package main
 
 import (
 	"converter-app-be/internal/convert"
+	"converter-app-be/internal/io"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 )
 
 func main() {
@@ -28,31 +26,10 @@ func main() {
 			return
 		}
 
-		data, err := ioutil.ReadAll(file)
+		fileName, fileLength, err := io.WriteFileToTempFolder(file)
 		if err != nil {
-			log.Println(err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": "Error reading file",
-			})
-			return
-		}
-
-		fileName := uuid.New().String()
-		newFile, err := os.OpenFile("/tmp/"+fileName+".jpg", os.O_WRONLY|os.O_CREATE, 0644)
-		if err != nil {
-			log.Println(err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": "Error opening temp directory",
-			})
-			return
-		}
-		defer file.Close()
-
-		_, err = newFile.Write(data)
-		if err != nil {
-			log.Println(err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": "Error writing data to temp directory",
+				"error": "Error while processing file",
 			})
 			return
 		}
@@ -66,6 +43,7 @@ func main() {
 			return
 		}
 
+		c.Header("Content-Length", fileLength)
 		c.Header("Content-Disposition", "attachment; filename="+fileName+".png")
 		c.Header("Content-Type", "application/octet-stream")
 		c.File("/tmp/" + fileName + ".png")
