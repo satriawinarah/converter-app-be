@@ -8,7 +8,7 @@ import (
 )
 
 func JpgToPngConversion(fileName string) error {
-	jpegFile, err := os.Open("temp/" + fileName + ".jpg")
+	jpegFile, err := os.Open("/tmp/" + fileName + ".jpg")
 	if err != nil {
 		log.Println(err)
 		return err
@@ -21,7 +21,7 @@ func JpgToPngConversion(fileName string) error {
 		return err
 	}
 
-	pngFile, err := os.Create("temp/" + fileName + ".png")
+	pngFile, err := os.Create("/tmp/" + fileName + ".png")
 	if err != nil {
 		log.Println(err)
 		return err
